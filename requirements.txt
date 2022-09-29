@@ -1,4 +1,4 @@
-install -U --pre aiogram
+yay -S python-aiogram3
 requests
 asyncio
 datetime
