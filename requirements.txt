@@ -1,4 +1,4 @@
-aiogram
+pip install -U --pre aiogram
 requests
 asyncio
 datetime
