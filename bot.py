@@ -1,5 +1,5 @@
 import asyncio
-#import logging
+import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -7,10 +7,10 @@ from handlers import questions, low_high_price, bestdeal, history
 
 
 async def main():
-    #logging.basicConfig(
-     #   level=logging.INFO,
-      #  format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    #)
+    logging.basicConfig(
+        level=logging.INFO,
+         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    )
 
     dp = Dispatcher(storage=MemoryStorage())
     bot = Bot(token="5546523733:AAGz1My1HV2VDnvhedZ7efgUBPfSK7GUlos")
