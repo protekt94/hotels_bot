@@ -83,8 +83,7 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
         }
         response = requests.request("GET", url, headers=headers, params=querystring)
         data = response.json()
-        count_night = date_departures-date_arrival
-        "total $239 for 4&nbsp;nights"
+        count_night = datetime.datetime.strptime(date_departures, '%Y-%m-%d')-datetime.datetime.strptime(date_arrival, '%Y-%m-%d')
         return data
 
     def get_hotels(id_hotel, date_arrival, date_departures):
@@ -193,7 +192,7 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
 
     @router.message(OrderFood.get_numbers_photo, F.text)
     async def get_numbers_photo(message: Message, state: FSMContext):
-        global price_hotel, numbers_hotels, numbers_photo
+        global price_hotel, numbers_hotels, numbers_photo, count_night
         numbers_photo = message.text
         if 9 < int(numbers_photo) <= 0:
             await message.answer(text='Вы ввели недопустимое число. Попробуйте еще раз!')
@@ -210,7 +209,7 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
                 await message.answer_media_group(media=[types.InputMediaPhoto(media=photo) for photo in photos])
                 await message.answer(text=f'Name: {name}\n'
                                           f'Star rating: {star_rating}\n'
-                                          f'Current price: {current_price}'
+                                          f'Total {current_price} for {count_night} nights'
                                      )
 
     def info_hotels(id_hotel):
@@ -247,5 +246,5 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
             BotDB.add_record(message.chat.id, name, star_rating, current_price)
             await message.answer(text=f'Name: {name}\n '
                                       f'Star rating: {star_rating}\n'
-                                      f'Current price: {current_price}'
+                                      f'Total {current_price} for {count_night} nights'
                                  )
