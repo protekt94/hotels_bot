@@ -18,7 +18,7 @@ def get_yes_no_kb() -> ReplyKeyboardMarkup:
         [
             types.InlineKeyboardButton(text="Да", callback_data="yes"),
             types.InlineKeyboardButton(text="Нет", callback_data="no"),
-         ]
+        ]
     ]
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons, resize_keyboard=True)
     return keyboard
@@ -27,12 +27,21 @@ def get_yes_no_kb() -> ReplyKeyboardMarkup:
 def get_keyboard():
     buttons = [
         [
-            types.InlineKeyboardButton(text="Топ самых дешёвых отелей", callback_data="lowprice"),
-            types.InlineKeyboardButton(text="Топ самых дорогих отелей", callback_data="highprice"),
-            types.InlineKeyboardButton(text="История поиска отелей", callback_data="/history")
+            types.InlineKeyboardButton(text="Топ самых дешёвых отелей", callback_data="/lowprice")
         ],
-        [types.InlineKeyboardButton(text="Наиболее подходящие по цене и расположению от центра",
-                                    callback_data="bestdeal")]
+        [
+            types.InlineKeyboardButton(text="Топ самых дорогих отелей", callback_data="/highprice")
+        ],
+        [
+            types.InlineKeyboardButton(text="История поиска отелей", callback_data="history")
+        ],
+        [
+            types.InlineKeyboardButton(text="Наиболее подходящие по цене и расположению от центра",
+                                       callback_data="/bestdeal")
+        ],
+        [
+            types.InlineKeyboardButton(text='Возможности бота', callback_data="/help")
+        ]
     ]
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons, resize_keyboard=True)
     return keyboard

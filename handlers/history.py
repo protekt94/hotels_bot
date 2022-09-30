@@ -1,12 +1,22 @@
 from aiogram import Router, F, types
+from aiogram.filters.command import Command
 from aiogram.filters.text import Text
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message
-from keyboards.for_questions import get_yes_no_kb
-import requests
-import datetime
+from handlers.questions import BotDB
 
 router = Router()
+
+
+@router.message(Command(commands=("history", "h"), commands_prefix="/!"))
+async def hello_world(message: types.Message):
+    records = BotDB.get_records(message.chat.id)
+    if records:
+        for r in records:
+            await message.answer(text=f'Name: {r[2]}\n'
+                                      f'Star rating: {r[3]}\n'
+                                      f'Current price: {r[4]}\n'
+                                      f'Request time" {r[5]}'
+                                 )
+    else:
+        await message.answer(text='Вы еще не делали запросов. Начните новый запрос с помощью команды (/start)')
 
 
