@@ -22,10 +22,11 @@ class BotDB:
         self.cursor.execute("INSERT INTO `users` (`user_id`) VALUES (?)", (user_id,))
         return self.conn.commit()
 
-    def add_record(self, user_id, hotel_name, rating, price):
+    def add_record(self, user_id, hotel_name, rating, price, photos):
         """Создаем запись о доходах/расходах"""
-        self.cursor.execute("INSERT INTO `records` (`user_id`, `hotel_name`, `rating`,'price') VALUES (?, ?, ?, ?)",
-                            (self.get_user_id(user_id), hotel_name, rating, price))
+        self.cursor.execute("INSERT INTO `records` (`user_id`, `hotel_name`, `rating`,'price', 'photos') VALUES (?, ?, "
+                            "?, ?, ?)",
+                            (self.get_user_id(user_id), hotel_name, rating, price, photos))
 
         return self.conn.commit()
 

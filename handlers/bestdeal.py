@@ -1,3 +1,5 @@
+import json
+
 from aiogram import Router, F, types
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
@@ -35,6 +37,7 @@ price_max = ''
 distance_max = ''
 price_hotel = []
 count_night = ''
+photos = []
 
 
 @router.callback_query(Text(text='/bestdeal'))
@@ -55,7 +58,7 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
         data = response.json()
         return data
 
-    def get_destinationId(city):
+    def get_destination_id(city):
         url = "https://hotels4.p.rapidapi.com/locations/v2/search"
         querystring = {"query": city, "locale": "en_US", "currency": "USD"}
         headers = {
@@ -106,7 +109,7 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
         city = message.text
         print(f'Город - {city}')
         try:
-            destination = get_destinationId(city)
+            destination = get_destination_id(city)
             await message.answer(text='Введите дату приезда в формате yyyy-mm-dd')
             await state.set_state(OrderFood.get_date_departures)
         except IndexError:
@@ -191,8 +194,8 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
             await state.set_state(OrderFood.get_number_hotels)
 
     @router.message(OrderFood.get_numbers_photo, F.text)
-    async def get_numbers_photo(message: Message, state: FSMContext):
-        global price_hotel, numbers_hotels, numbers_photo, count_night
+    async def get_numbers_photo(message: types.Message, state: FSMContext):
+        global price_hotel, numbers_hotels, numbers_photo, count_night, photos
         numbers_photo = message.text
         if 9 < int(numbers_photo) <= 0:
             await message.answer(text='Вы ввели недопустимое число. Попробуйте еще раз!')
@@ -206,10 +209,12 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
                     urls = all_photo['hotelImages'][num_photo]['baseUrl']
                     new_url = urls.replace('_{size}', '')
                     photos.append(new_url)
+                photos_dumps = json.dumps(photos)
+                BotDB.add_record(message.chat.id, name, star_rating, current_price, photos_dumps)
                 await message.answer_media_group(media=[types.InputMediaPhoto(media=photo) for photo in photos])
                 await message.answer(text=f'Name: {name}\n'
                                           f'Star rating: {star_rating}\n'
-                                          f'Total {current_price} for {count_night} nights'
+                                          f'Current price: {current_price}'
                                      )
 
     def info_hotels(id_hotel):
@@ -239,11 +244,12 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
 
     @router.callback_query(Text(text="no"))
     async def callback(callback: types.CallbackQuery):
-        global numbers_hotels
+        global numbers_hotels, price_hotel
+        print(price_hotel)
         message = callback.message
         for id_hotel in price_hotel[:int(numbers_hotels)]:
             name, star_rating, current_price = info_hotels(id_hotel)
-            BotDB.add_record(message.chat.id, name, star_rating, current_price)
+            BotDB.add_record(message.chat.id, name, star_rating, current_price, None)
             await message.answer(text=f'Name: {name}\n '
                                       f'Star rating: {star_rating}\n'
                                       f'Total {current_price} for {count_night} nights'
