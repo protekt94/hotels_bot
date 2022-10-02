@@ -157,12 +157,18 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
                     new_url = urls.replace('_{size}', '')
                     photos.append(new_url)
                 photos_dumps = json.dumps(photos)
+                media = []
+                for i_photo in photos:
+                    if i_photo == photos[0]:
+                        media.append(types.InputMediaPhoto(type='photo', media=i_photo, caption=
+                        f'Name: {name}\n '
+                        f'Star rating: {star_rating}\n'
+                        f'Current price: {current_price}'
+                                                           ))
+                    else:
+                        media.append(types.InputMediaPhoto(type='photo', media=i_photo))
+                await message.answer_media_group(media=media)
                 BotDB.add_record(message.chat.id, name, star_rating, current_price, photos_dumps)
-                await message.answer_media_group(media=[types.InputMediaPhoto(media=photo) for photo in photos])
-                await message.answer(text=f'Name: {name}\n'
-                                          f'Star rating: {star_rating}\n'
-                                          f'Current price: {current_price}'
-                                     )
 
     def info_hotels(number_hotel):
         global get_hotel
