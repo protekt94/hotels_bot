@@ -1,9 +1,8 @@
 import asyncio
 import logging
-
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from handlers import questions, low_high_price, bestdeal, history
+from handlers import questions, low_high_price, bestdeal, history, clear, help
 
 
 async def main():
@@ -19,6 +18,8 @@ async def main():
     dp.include_router(low_high_price.router)
     dp.include_router(bestdeal.router)
     dp.include_router(history.router)
+    dp.include_router(clear.router)
+    dp.include_router(help.router)
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 
