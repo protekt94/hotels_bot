@@ -1,4 +1,3 @@
-aiogram
+aiogram>=3.0.0b4
 requests
 asyncio
-datetime
