@@ -8,7 +8,7 @@ from handlers import questions, low_high_price, bestdeal, history, clear, help
 async def main():
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
 
     dp = Dispatcher(storage=MemoryStorage())
