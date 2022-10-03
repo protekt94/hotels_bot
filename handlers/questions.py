@@ -7,7 +7,7 @@ from keyboards.for_questions import get_keyboard
 
 router = Router()
 
-BotDB = BotDB('user.db')
+BotDB = BotDB()
 
 
 @router.message(Command(commands=["start", "hello-world", "s"], commands_prefix="/!"))
