@@ -15,15 +15,16 @@ async def hello_world(message: types.Message):
     if records:
         for r in records:
             media = []
-            if r[6]:
-                photos = json.loads(r[6])
+            print(r)
+            if r[5]:
+                photos = json.loads(r[5])
                 for i_photo in photos:
                     if i_photo == photos[0]:
                         media.append(types.InputMediaPhoto(type='photo', media=i_photo, caption=
                         f'Name: {r[2]}\n'
                         f'Star rating: {r[3]}\n'
                         f'Current price: {r[4]}\n'
-                        f'Request time {r[5]}'
+                        f'Request time {r[6]}'
                                                            ))
                     else:
                         media.append(types.InputMediaPhoto(type='photo', media=i_photo))
@@ -32,7 +33,7 @@ async def hello_world(message: types.Message):
                 await message.answer(text=f'Name: {r[2]}\n'
                                           f'Star rating: {r[3]}\n'
                                           f'Current price: {r[4]}\n'
-                                          f'Request time {r[5]}'
+                                          f'Request time {r[6]}'
                                      )
     else:
         await message.answer(text='Вы еще не делали запросов. Начните новый запрос с помощью команды (/start)')
