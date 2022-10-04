@@ -223,6 +223,7 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
                         media.append(types.InputMediaPhoto(type='photo', media=i_photo))
                 await message.answer_media_group(media=media)
                 BotDB.add_record(message.chat.id, name, star_rating, current_price, photos_dumps)
+                await state.set_state(state=None)
 
     def info_hotels(id_hotel):
         global date_arrival, date_departures, get_hotel
@@ -261,3 +262,4 @@ async def hello_world(callback: types.CallbackQuery, state: FSMContext):
                                       f'Star rating: {star_rating}\n'
                                       f'Total {current_price} for {count_night} nights'
                                  )
+            await state.set_state(state=None)
