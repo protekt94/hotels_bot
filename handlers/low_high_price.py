@@ -2,6 +2,7 @@ import json
 
 from aiogram import Router, F, types
 from aiogram.filters.text import Text
+from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
@@ -78,15 +79,25 @@ def get_hotels(destination, numbers_hotels, date_departures, date_arrival, price
 user_data = {}
 
 
+@router.message(Command(commands=("lowprice", "l", "highprice", "hp"), commands_prefix="/!"))
 @router.callback_query(Text(text_endswith='price'))
-async def hello_world(callback: types.CallbackQuery, state: FSMContext):
+async def hello_world(message: types.Message, state: FSMContext):
     global get_price
-    message = callback.message
-    if callback.data == '/lowprice':
-        get_price = 'PRICE'
-    elif callback.data == '/highprice':
-        get_price = 'PRICE_HIGHEST_FIRST'
-    await message.answer(text='Введите название города где будет проводиться поиск')
+    try:
+        print(message)
+        if message.data:
+            if message.data == '/lowprice':
+                get_price = 'PRICE'
+            elif message.data == '/highprice':
+                get_price = 'PRICE_HIGHEST_FIRST'
+            await message.answer(text='1' )
+    except AttributeError:
+        print(message)
+        if message.text == '/lowprice':
+            get_price = 'PRICE'
+        elif message.text == '/highprice':
+            get_price = 'PRICE_HIGHEST_FIRST'
+        await message.answer(text='Введите название города где будет проводиться поиск')
     await state.set_state(OrderFood.get_city)
 
     @router.message(OrderFood.get_city, F.text)

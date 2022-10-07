@@ -2,6 +2,7 @@ import json
 
 from aiogram import Router, F, types
 from aiogram.filters.text import Text
+from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
@@ -40,9 +41,10 @@ count_night = ''
 photos = []
 
 
+@router.message(Command(commands=("bestdeal", "b"), commands_prefix="/!"))
 @router.callback_query(Text(text='/bestdeal'))
-async def hello_world(callback: types.CallbackQuery, state: FSMContext):
-    message = callback.message
+async def hello_world(message: types.Message,callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer()
     await message.answer(text='Введите название города где будет проводиться поиск')
     await state.set_state(OrderFood.get_city)
 
