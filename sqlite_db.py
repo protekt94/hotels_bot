@@ -44,7 +44,6 @@ class BotDB:
         return self.cursor.fetchall()
 
     def get_del_records(self, user_id):
-        print(self.get_user_id(user_id))
         self.cursor.execute("""DELETE FROM records WHERE user_id = %s""", (self.get_user_id(user_id),))
         return self.conn.commit()
 

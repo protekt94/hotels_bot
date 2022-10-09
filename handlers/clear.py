@@ -14,18 +14,38 @@ class OrderFood(StatesGroup):
 
 
 @router.message(Command(commands=("clear", "c"), commands_prefix="/!"))
-async def hello_world(message: types.Message, state: FSMContext):
+async def clear_history(message: types.Message, state: FSMContext):
+    """
+    Функция по очистке истории. Вопрос нужно ли отчистить
+    :param message: команда
+    :param state: состояние
+    :return: None
+    """
     await message.answer('Вы действительно хотите очистить историю?', reply_markup=get_yes_no_kb())
     await state.set_state(OrderFood.get_delete)
 
-    @router.callback_query(Text(text="yes"))
+    @router.callback_query(Text(text="yes"), OrderFood.get_delete)
     async def callback(callback: types.CallbackQuery):
+        """
+        Функция по очистке с положительным вопросом
+        :param callback: Да
+        :return: очищает историю
+        """
         message = callback.message
-        BotDB.get_del_records(message.chat.id)
-        await message.answer('Ваша история удалена. Начните новый запрос с помощью команды (/start)')
+        record = BotDB.get_records(message.chat.id)
+        if record:
+            BotDB.get_del_records(message.chat.id)
+            await message.answer('Ваша история удалена. Начните новый запрос с помощью команды (/start)')
+        else:
+            await message.answer(text='Вы еще не делали запросов. Начните новый запрос с помощью команды (/start)')
 
-    @router.callback_query(Text(text="no"))
+    @router.callback_query(Text(text="no"), OrderFood.get_delete)
     async def callback(callback: types.CallbackQuery):
+        """
+        Функция по очистке с отрицательным вопросом
+        :param callback: Нет
+        :return: не очищает историю
+        """
         message = callback.message
         await message.answer('Начните новый запрос с помощью команды (/start)')
 

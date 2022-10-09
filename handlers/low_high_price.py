@@ -25,14 +25,22 @@ photos = []
 
 
 class OrderFood(StatesGroup):
+    """
+    Класс, который создает состояние для функций
+    """
     get_date_departures = State()
     get_date_arrival = State()
     get_city = State()
     get_number_hotels = State()
     get_numbers_photo = State()
-
+    get_yes_no = State()
 
 def get_photo(hotel):
+    """
+    Функция получения фото по id отеля
+    :param hotel: id отеля
+    :return: список из ссылок на фото
+    """
     print('Получил фото отеля')
     url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos"
     querystring = {"id": hotel}
@@ -46,6 +54,11 @@ def get_photo(hotel):
 
 
 def get_destination_id(city):
+    """
+    Функция получения id города
+    :param city: Название города
+    :return: id города
+    """
     url = "https://hotels4.p.rapidapi.com/locations/v2/search"
     querystring = {"query": city, "locale": "ru_RU", "currency": "USD"}
     headers = {
@@ -60,6 +73,15 @@ def get_destination_id(city):
 
 
 def get_hotels(destination, numbers_hotels, date_departures, date_arrival, price):
+    """
+    Функция получения списка отелей
+    :param destination: id города
+    :param numbers_hotels: количество отелей, которое необходимо вывести
+    :param date_departures: дата приезда в отель
+    :param date_arrival: дата отъезда из отеля
+    :param price: сортировка по цене
+    :return: список id отелей
+    """
     print('Получил номера всех отелей')
     url = "https://hotels4.p.rapidapi.com/properties/list"
     querystring = {"destinationId": destination, "pageNumber": "1", "pageSize": numbers_hotels,
@@ -82,6 +104,12 @@ user_data = {}
 @router.message(Command(commands=("lowprice", "l", "highprice", "hp"), commands_prefix="/!"))
 @router.callback_query(Text(text_endswith='price'))
 async def hello_world(message: types.Message, state: FSMContext):
+    """
+    Функция входа в поиск дешевых и дорогих отелей
+    :param message: lowprice - сортировка по дешевизне, highprice - сортировка по дороговизне
+    :param state: состояние
+    :return: None
+    """
     global get_price
     try:
         print(message)
@@ -90,7 +118,7 @@ async def hello_world(message: types.Message, state: FSMContext):
                 get_price = 'PRICE'
             elif message.data == '/highprice':
                 get_price = 'PRICE_HIGHEST_FIRST'
-            await message.answer(text='1' )
+            await message.answer(text='1')
     except AttributeError:
         print(message)
         if message.text == '/lowprice':
@@ -102,6 +130,12 @@ async def hello_world(message: types.Message, state: FSMContext):
 
     @router.message(OrderFood.get_city, F.text)
     async def get_city(message: Message, state: FSMContext):
+        """
+        Функция проверки города
+        :param message: город
+        :param state: состояние
+        :return: None
+        """
         global city, destination
         city = message.text
         print(f'Город - {city}')
@@ -115,6 +149,12 @@ async def hello_world(message: types.Message, state: FSMContext):
 
     @router.message(OrderFood.get_date_departures, F.text)
     async def get_date_departures(message: Message, state: FSMContext):
+        """
+        Функция получения даты заселения
+        :param message: дата заселения в формате yyyy-mm-dd
+        :param state: состояние
+        :return: None
+        """
         global date_departures
         date_departures = message.text
         try:
@@ -128,6 +168,12 @@ async def hello_world(message: types.Message, state: FSMContext):
 
     @router.message(OrderFood.get_date_arrival, F.text)
     async def get_date_arrival(message: Message, state: FSMContext):
+        """
+        Функция получения даты выезда
+        :param message: дата выезда в формате yyyy-mm-dd
+        :param state: состояние
+        :return: None
+        """
         global date_arrival, get_hotel, get_price, numbers_hotels, destination, date_departures
         date_arrival = message.text
         try:
@@ -142,16 +188,29 @@ async def hello_world(message: types.Message, state: FSMContext):
 
     @router.message(OrderFood.get_number_hotels, F.text)
     async def get_number_hotels(message: Message, state: FSMContext):
+        """
+        Функция получения кол-ва отелей
+        :param message: кол-во отелей, которое необходимо вывести
+        :param state: состояние
+        :return: None
+        """
         global numbers_hotels
         numbers_hotels = message.text
         if int(numbers_hotels) < 25 or int(numbers_hotels) > 0:
             await message.answer('Нужно ли вывести фото отелей?', reply_markup=get_yes_no_kb())
+            await state.set_state(OrderFood.get_yes_no)
         else:
             await message.answer(text='Вы ввели недопустимое число. Попробуйте еще раз!')
             await state.set_state(OrderFood.get_number_hotels)
 
     @router.message(OrderFood.get_numbers_photo, F.text)
     async def get_numbers_photo(message: Message, state: FSMContext):
+        """
+        Функция вывода фото отеля
+        :param message: кол-во фото, которое необходимо вывести
+        :param state: состояние
+        :return: None
+        """
         global numbers_photo, numbers_hotels, get_hotel, photos
         numbers_photo = message.text
         if 9 < int(numbers_photo) <= 0:
@@ -183,6 +242,11 @@ async def hello_world(message: types.Message, state: FSMContext):
                 await state.set_state(state=None)
 
     def info_hotels(number_hotel):
+        """
+        Функция вывода информации о отеле
+        :param number_hotel: id отеля
+        :return: Имя отеля, рейтинг, цена
+        """
         global get_hotel
         name = get_hotel['data']['body']['searchResults']['results'][number_hotel]['name']
         star_rating = get_hotel['data']['body']['searchResults']['results'][number_hotel]['starRating']
@@ -190,14 +254,25 @@ async def hello_world(message: types.Message, state: FSMContext):
             'current']
         return name, star_rating, current_price
 
-    @router.callback_query(Text(text="yes"))
+    @router.callback_query(Text(text="yes"), OrderFood.get_yes_no)
     async def callback(callback: types.CallbackQuery, state: FSMContext):
+        """
+        Функция вывода информации с фото
+        :param callback: Ответ "Да"
+        :param state: состояние
+        :return: None
+        """
         message = callback.message
         await message.answer(text='Сколько фото отеля показать? (не больше 10)')
         await state.set_state(OrderFood.get_numbers_photo)
 
-    @router.callback_query(Text(text="no"))
+    @router.callback_query(Text(text="no"), OrderFood.get_yes_no)
     async def callback(callback: types.CallbackQuery):
+        """
+        Функция вывода информации без фото
+        :param callback: Ответ "Нет"
+        :return: None
+        """
         global numbers_hotels
         message = callback.message
         for num_hotel in range(int(numbers_hotels)):
@@ -208,3 +283,4 @@ async def hello_world(message: types.Message, state: FSMContext):
                                       f'Current price: {current_price}'
                                  )
             await state.set_state(state=None)
+        return
